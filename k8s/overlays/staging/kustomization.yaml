@@ -1,0 +1,43 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: fastapi-staging
+
+resources:
+  - ../../base
+
+namePrefix: staging-
+
+patches:
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 2
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: "100m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: "128Mi"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: "500m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: "256Mi"
+    target:
+      kind: Deployment
+      name: fastapi-app
+
+images:
+  - name: fastapi-k8s-demo
+    newTag: "1.0.0"
+
+configMapGenerator:
+  - name: fastapi-config
+    behavior: merge
+    literals:
+      - ENVIRONMENT=staging
+      - DEBUG=false
+      - LOG_LEVEL=INFO
+      - WORKERS=2

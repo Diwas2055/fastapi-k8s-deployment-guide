@@ -1,0 +1,12 @@
+apiVersion: v2
+name: fastapi-app
+description: Production-grade FastAPI application Helm chart
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - fastapi
+  - python
+  - api
+maintainers:
+  - name: platform-team

@@ -1,0 +1,17 @@
+# Requires kube-prometheus-stack or Prometheus Operator installed
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: fastapi-app-monitor
+  namespace: fastapi-app
+  labels:
+    release: kube-prometheus-stack    # must match Prometheus operator's serviceMonitorSelector
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: fastapi-app
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s
+      scrapeTimeout: 10s

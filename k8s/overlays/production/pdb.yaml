@@ -1,0 +1,10 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: fastapi-app-pdb
+  namespace: fastapi-app
+spec:
+  minAvailable: 1       # Always keep at least 1 pod available during voluntary disruptions
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: fastapi-app

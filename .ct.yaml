@@ -1,0 +1,4 @@
+chart-dirs:
+  - k8s/helm
+lint-conf: {}
+validate-maintainers: false

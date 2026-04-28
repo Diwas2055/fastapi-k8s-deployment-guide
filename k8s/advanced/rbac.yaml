@@ -1,0 +1,24 @@
+# Least-privilege RBAC: only grant what the app actually needs
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: fastapi-app-role
+  namespace: fastapi-app
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "watch"]   # read-only; never grant "create","update","delete" unless needed
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: fastapi-app-rolebinding
+  namespace: fastapi-app
+subjects:
+  - kind: ServiceAccount
+    name: fastapi-app-sa
+    namespace: fastapi-app
+roleRef:
+  kind: Role
+  apiRef: fastapi-app-role
+  apiGroup: rbac.authorization.k8s.io

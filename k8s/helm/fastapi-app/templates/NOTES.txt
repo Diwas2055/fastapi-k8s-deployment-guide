@@ -1,0 +1,23 @@
+FastAPI App has been deployed!
+
+Release:   {{ .Release.Name }}
+Namespace: {{ .Release.Namespace }}
+Version:   {{ .Chart.AppVersion }}
+
+Access the API:
+{{- if .Values.ingress.enabled }}
+  https://{{ (first .Values.ingress.hosts).host }}
+{{- else }}
+  kubectl port-forward svc/{{ include "fastapi-app.fullname" . }} 8080:{{ .Values.service.port }} -n {{ .Release.Namespace }}
+  http://localhost:8080
+{{- end }}
+
+Health check:
+  curl http://localhost:8080/healthz/ready
+
+HPA status:
+{{- if .Values.autoscaling.enabled }}
+  kubectl get hpa {{ include "fastapi-app.fullname" . }} -n {{ .Release.Namespace }}
+{{- else }}
+  Autoscaling is disabled. Set autoscaling.enabled=true to enable HPA.
+{{- end }}

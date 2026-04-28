@@ -1,0 +1,110 @@
+replicaCount: 2
+
+image:
+  repository: fastapi-k8s-demo
+  tag: "1.0.0"
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  automountToken: false
+  name: ""
+
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "8000"
+  prometheus.io/path: "/metrics"
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+
+ingress:
+  enabled: false
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - host: api.yourdomain.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: fastapi-tls
+      hosts:
+        - api.yourdomain.com
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+pdb:
+  enabled: true
+  minAvailable: 1
+
+env:
+  ENVIRONMENT: production
+  DEBUG: "false"
+  LOG_LEVEL: INFO
+  ENABLE_METRICS: "true"
+  WORKERS: "2"
+
+# Sensitive values — override via --set or external secret manager; never commit real values
+secrets:
+  DATABASE_URL: ""
+  SECRET_KEY: ""
+
+probes:
+  startup:
+    failureThreshold: 30
+    periodSeconds: 2
+  liveness:
+    periodSeconds: 10
+    timeoutSeconds: 3
+    failureThreshold: 3
+  readiness:
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
+
+terminationGracePeriodSeconds: 30
+
+topologySpread:
+  enabled: true
+  maxSkew: 1
+
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1001
+  runAsGroup: 1001
+  fsGroup: 1001
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+
+networkPolicy:
+  enabled: false    # set true to enforce default-deny + explicit allows
+  dbPort: 5432
+
+serviceMonitor:
+  enabled: false    # set true if kube-prometheus-stack is installed
+  path: /metrics
+  interval: 15s
+  scrapeTimeout: 10s
+  additionalLabels:
+    release: kube-prometheus-stack   # must match Prometheus operator's selector

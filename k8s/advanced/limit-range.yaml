@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: fastapi-app-limits
+  namespace: fastapi-app
+spec:
+  limits:
+    # Per-container defaults (applied when no resources block is set)
+    - type: Container
+      default:
+        cpu: "250m"
+        memory: "128Mi"
+      defaultRequest:
+        cpu: "50m"
+        memory: "64Mi"
+      max:
+        cpu: "2"
+        memory: "1Gi"
+      min:
+        cpu: "10m"
+        memory: "16Mi"
+    # Per-pod maximum
+    - type: Pod
+      max:
+        cpu: "4"
+        memory: "2Gi"
+    # PersistentVolumeClaim size guard
+    - type: PersistentVolumeClaim
+      max:
+        storage: 20Gi
+      min:
+        storage: 1Gi
