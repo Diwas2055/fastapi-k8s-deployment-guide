@@ -18,7 +18,9 @@ async def lifespan(app: FastAPI):
     settings = get_settings()
     configure_logging(log_level=settings.log_level, json=settings.environment != "development")
 
-    logger.info("startup", app=settings.app_name, env=settings.environment, version=settings.app_version)
+    logger.info(
+        "startup", app=settings.app_name, env=settings.environment, version=settings.app_version
+    )
 
     await init_db(settings.database_url)
     mark_startup_complete()

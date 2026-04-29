@@ -56,7 +56,9 @@ async def test_missing_item_returns_404(client):
 
 @pytest.mark.asyncio
 async def test_partial_update_keeps_other_fields(client):
-    create = await client.post("/api/v1/items/", json={"name": "Gadget", "description": "Cool", "price": 10.0})
+    create = await client.post(
+        "/api/v1/items/", json={"name": "Gadget", "description": "Cool", "price": 10.0}
+    )
     item_id = create.json()["id"]
 
     update = await client.patch(f"/api/v1/items/{item_id}", json={"price": 20.0})
